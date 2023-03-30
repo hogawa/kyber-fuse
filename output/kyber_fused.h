@@ -1,7 +1,7 @@
 #ifndef PARAMS_H
 #define PARAMS_H
 
-//__KYBER_FUSE__
+//__KYBER_FUSE__: common includes
 #include <stdint.h>
 #include <stddef.h>
 
