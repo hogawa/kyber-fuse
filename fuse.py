@@ -15,6 +15,26 @@ def extract_from_reduce_h(f_path):
         return content
 
 
+def extract_from_poly_h(f_path):
+    """
+    In this file we just have to extract the definition of the 'poly' struct
+    :param f_path: path to source poly.h file
+    :return: extracted relevant content
+    """
+    content = []
+    with open(f_path, 'r') as in_f:
+        found = False
+        for ln in in_f:
+            if "typedef struct" in ln:
+                found = True
+                content.append(ln)
+            elif found:
+                content.append(ln)
+                if "poly;" in ln:
+                    break
+        return content
+
+
 def extract_from_reduce_c(f_path):
     content = []
     with open(f_path, 'r') as in_f:
@@ -25,6 +45,34 @@ def extract_from_reduce_c(f_path):
 
 
 def extract_from_ntt_c(f_path):
+    content = []
+    with open(f_path, 'r') as in_f:
+        for ln in in_f:
+            if "#include" not in ln:
+                content.append(ln)
+        return content
+
+
+def extract_from_cbd_c(f_path):
+    """
+    In this file we can extract everything, except the '#include' statements
+    :param f_path: path to source cbd.c file
+    :return: extracted relevant content
+    """
+    content = []
+    with open(f_path, 'r') as in_f:
+        for ln in in_f:
+            if "#include" not in ln:
+                content.append(ln)
+        return content
+
+
+def extract_from_poly_c(f_path):
+    """
+    In this file we can extract everything, except the '#include' statements
+    :param f_path: path to source poly.c file
+    :return: extracted relevant content
+    """
     content = []
     with open(f_path, 'r') as in_f:
         for ln in in_f:
@@ -71,6 +119,12 @@ if __name__ == '__main__':
         [out_buf.append(line) for line in extract_from_reduce_h('kyber/ref/reduce.h')]
         out_buf.append('// end of reduce.h\n')
 
+        # Structs and common variables
+        # ======================================= Load contents from poly.h ============================================
+        out_buf.append('\n//__KYBER_FUSE__: extracted from poly.h\n')
+        [out_buf.append(line) for line in extract_from_poly_h('kyber/ref/poly.h')]
+        out_buf.append('// end of poly.h\n')
+
         # Function implementations
         # ======================================== Load contents from reduce.c =========================================
         out_buf.append('\n//__KYBER_FUSE__: extracted from reduce.c')
@@ -101,6 +155,23 @@ if __name__ == '__main__':
 
         ins_idx = out_buf.index('void basemul(int16_t r[2], const int16_t a[2], const int16_t b[2], int16_t zeta)\n')
         out_buf.insert(ins_idx, 'KYBERFUSE_STATIC ')
+
+        # ========================================== Load contents from cbd.c ==========================================
+        out_buf.append('\n//__KYBER_FUSE__: extracted from cbd.c')
+        [out_buf.append(line) for line in extract_from_cbd_c('kyber/ref/cbd.c')]
+        out_buf.append('// end of cbd.c\n')
+
+        # Append static to cbd.c functions
+        ins_idx = out_buf.index('void poly_cbd_eta1(poly *r, const uint8_t buf[KYBER_ETA1*KYBER_N/4])\n')
+        out_buf.insert(ins_idx, 'KYBERFUSE_STATIC ')
+
+        ins_idx = out_buf.index('void poly_cbd_eta2(poly *r, const uint8_t buf[KYBER_ETA2*KYBER_N/4])\n')
+        out_buf.insert(ins_idx, 'KYBERFUSE_STATIC ')
+
+        # ========================================= Load contents from poly.c ==========================================
+        # out_buf.append('\n//__KYBER_FUSE__: extracted from poly.c')
+        # [out_buf.append(line) for line in extract_from_poly_c('kyber/ref/poly.c')]
+        # out_buf.append('// end of poly.c\n')
 
         # ========================================== (FINAL) Write to file =============================================
         for line in out_buf:

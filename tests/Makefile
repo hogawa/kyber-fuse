@@ -1,5 +1,5 @@
 CC       = gcc
-CFLAGS   = -Wall -g -O2
+CFLAGS   = -Wall -g -O2 -Wno-unused-function
 INCLUDES = -I ../output/
 VPATH    = ../output/
 OBJS     = kyber_fused.o
