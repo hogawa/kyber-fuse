@@ -24,6 +24,15 @@ def extract_from_reduce_c(f_path):
         return content
 
 
+def extract_from_ntt_c(f_path):
+    content = []
+    with open(f_path, 'r') as in_f:
+        for ln in in_f:
+            if "#include" not in ln:
+                content.append(ln)
+        return content
+
+
 if __name__ == '__main__':
     # Create kyber_fused.h header file
     with open('output/kyber_fused.h', 'w') as out_f:
@@ -54,27 +63,30 @@ if __name__ == '__main__':
         out_buf.append(includes)
 
         # Local definitions
-        out_buf.append('\n#define KFUSE_STATIC static\n')
+        out_buf.append('\n#define KYBERFUSE_STATIC static\n')
 
         # Internal parameters
         # Load contents from reduce.h
         out_buf.append('\n//__KYBER_FUSE__: extracted from reduce.h\n')
-        for line in extract_from_reduce_h('kyber/ref/reduce.h'):
-            out_buf.append(line)
+        [out_buf.append(line) for line in extract_from_reduce_h('kyber/ref/reduce.h')]
         out_buf.append('// end of reduce.h\n')
 
         # Load contents from reduce.c
         out_buf.append('\n//__KYBER_FUSE__: extracted from reduce.c')
-        for line in extract_from_reduce_c('kyber/ref/reduce.c'):
-            out_buf.append(line)
+        [out_buf.append(line) for line in extract_from_reduce_c('kyber/ref/reduce.c')]
         out_buf.append('// end of reduce.c\n')
 
-        # Append 'static' to the functions
+        # Append 'static' to the functions from reduce.c
         ins_idx = out_buf.index('int16_t montgomery_reduce(int32_t a)\n')
-        out_buf.insert(ins_idx, 'KFUSE_STATIC ')
+        out_buf.insert(ins_idx, 'KYBERFUSE_STATIC ')
 
         ins_idx = out_buf.index('int16_t barrett_reduce(int16_t a) {\n')
-        out_buf.insert(ins_idx, 'KFUSE_STATIC ')
+        out_buf.insert(ins_idx, 'KYBERFUSE_STATIC ')
+
+        # Load contents from ntt.c
+        out_buf.append('\n//__KYBER_FUSE__: extracted from ntt.c')
+        [out_buf.append(line) for line in extract_from_ntt_c('kyber/ref/ntt.c')]
+        out_buf.append('// end of ntt.c\n')
 
         # Write to file
         for line in out_buf:
