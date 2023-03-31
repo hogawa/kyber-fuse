@@ -82,7 +82,7 @@ void init_ntt() {
 }
 */
 
-const int16_t zetas[128] = {
+KYBERFUSE_STATIC const int16_t zetas[128] = {
   -1044,  -758,  -359, -1517,  1493,  1422,   287,   202,
    -171,   622,  1577,   182,   962, -1202, -1474,  1468,
     573, -1325,   264,   383,  -829,  1458, -1602,  -130,
@@ -123,7 +123,7 @@ static int16_t fqmul(int16_t a, int16_t b) {
 *
 * Arguments:   - int16_t r[256]: pointer to input/output vector of elements of Zq
 **************************************************/
-void ntt(int16_t r[256]) {
+KYBERFUSE_STATIC void ntt(int16_t r[256]) {
   unsigned int len, start, j, k;
   int16_t t, zeta;
 
@@ -149,7 +149,7 @@ void ntt(int16_t r[256]) {
 *
 * Arguments:   - int16_t r[256]: pointer to input/output vector of elements of Zq
 **************************************************/
-void invntt(int16_t r[256]) {
+KYBERFUSE_STATIC void invntt(int16_t r[256]) {
   unsigned int start, len, j, k;
   int16_t t, zeta;
   const int16_t f = 1441; // mont^2/128
@@ -182,7 +182,7 @@ void invntt(int16_t r[256]) {
 *              - const int16_t b[2]: pointer to the second factor
 *              - int16_t zeta: integer defining the reduction polynomial
 **************************************************/
-void basemul(int16_t r[2], const int16_t a[2], const int16_t b[2], int16_t zeta)
+KYBERFUSE_STATIC void basemul(int16_t r[2], const int16_t a[2], const int16_t b[2], int16_t zeta)
 {
   r[0]  = fqmul(a[1], b[1]);
   r[0]  = fqmul(r[0], zeta);
