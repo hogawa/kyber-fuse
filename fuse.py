@@ -17,7 +17,7 @@ def extract_from_reduce_h(f_path):
 
 def extract_from_symmetric_h(f_path):
     """
-    In this file we have to extract everything except the includes and the header defines
+    In this file we have to extract everything except the includes, the header defines, and the function skelektons
     :param f_path: path to symmetric.h file
     :return: extracted relevant content
     """
@@ -31,6 +31,10 @@ def extract_from_symmetric_h(f_path):
                 if 'SYMMETRIC_H' not in ln and \
                         '#include <stddef.h>' not in ln and \
                         '#include <stdint.h>' not in ln and \
+                        'void' not in ln and \
+                        'const uint8_t seed[KYBER_SYMBYTES],' not in ln and \
+                        'uint8_t x,' not in ln and \
+                        'uint8_t y);' not in ln and \
                         '#include "params.h"' not in ln:
                     content.append(ln)
             if '#endif /* KYBER_90S */' in ln:
@@ -191,13 +195,13 @@ if __name__ == '__main__':
         out_buf.append('// end of symmetric-aes.c\n')
 
         # Append 'static' to the functions from symmetric-aes.c
-        # ins_idx = out_buf.index('void kyber_aes256xof_absorb(aes256ctr_ctx *state, const uint8_t seed[32], '
-        #                         'uint8_t x, uint8_t y)\n')
-        # out_buf.insert(ins_idx, 'KYBERFUSE_STATIC ')
-        #
-        # ins_idx = out_buf.index('void kyber_aes256ctr_prf(uint8_t *out, size_t outlen, const uint8_t key[32], '
-        #                         'uint8_t nonce)\n')
-        # out_buf.insert(ins_idx, 'KYBERFUSE_STATIC ')
+        ins_idx = out_buf.index('void kyber_aes256xof_absorb(aes256ctr_ctx *state, const uint8_t seed[32], '
+                                'uint8_t x, uint8_t y)\n')
+        out_buf.insert(ins_idx, 'KYBERFUSE_STATIC ')
+
+        ins_idx = out_buf.index('void kyber_aes256ctr_prf(uint8_t *out, size_t outlen, const uint8_t key[32], '
+                                'uint8_t nonce)\n')
+        out_buf.insert(ins_idx, 'KYBERFUSE_STATIC ')
 
         # ==================================== Load contents from symmetric-shake.c ====================================
         out_buf.append('\n//__KYBER_FUSE__: extracted from symmetric-shake.c')
@@ -205,12 +209,12 @@ if __name__ == '__main__':
         out_buf.append('// end of symmetric-shake.c\n')
 
         # Append 'static' to the functions from symmetric-shake.c
-        # ins_idx = out_buf.index('void kyber_shake128_absorb(keccak_state *state,\n')
-        # out_buf.insert(ins_idx, 'KYBERFUSE_STATIC ')
-        #
-        # ins_idx = out_buf.index('void kyber_shake256_prf(uint8_t *out, size_t outlen, const uint8_t key['
-        #                         'KYBER_SYMBYTES], uint8_t nonce)\n')
-        # out_buf.insert(ins_idx, 'KYBERFUSE_STATIC ')
+        ins_idx = out_buf.index('void kyber_shake128_absorb(keccak_state *state,\n')
+        out_buf.insert(ins_idx, 'KYBERFUSE_STATIC ')
+
+        ins_idx = out_buf.index('void kyber_shake256_prf(uint8_t *out, size_t outlen, const uint8_t key['
+                                'KYBER_SYMBYTES], uint8_t nonce)\n')
+        out_buf.insert(ins_idx, 'KYBERFUSE_STATIC ')
 
         # ======================================== Load contents from reduce.c =========================================
         out_buf.append('\n//__KYBER_FUSE__: extracted from reduce.c')

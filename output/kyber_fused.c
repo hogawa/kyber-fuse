@@ -20,10 +20,8 @@
 typedef aes256ctr_ctx xof_state;
 
 #define kyber_aes256xof_absorb KYBER_NAMESPACE(kyber_aes256xof_absorb)
-void kyber_aes256xof_absorb(aes256ctr_ctx *state, const uint8_t seed[32], uint8_t x, uint8_t y);
 
 #define kyber_aes256ctr_prf KYBER_NAMESPACE(kyber_aes256ctr_prf)
-void kyber_aes256ctr_prf(uint8_t *out, size_t outlen, const uint8_t key[32], uint8_t nonce);
 
 #define XOF_BLOCKBYTES AES256CTR_BLOCKBYTES
 
@@ -41,13 +39,8 @@ void kyber_aes256ctr_prf(uint8_t *out, size_t outlen, const uint8_t key[32], uin
 typedef keccak_state xof_state;
 
 #define kyber_shake128_absorb KYBER_NAMESPACE(kyber_shake128_absorb)
-void kyber_shake128_absorb(keccak_state *s,
-                           const uint8_t seed[KYBER_SYMBYTES],
-                           uint8_t x,
-                           uint8_t y);
 
 #define kyber_shake256_prf KYBER_NAMESPACE(kyber_shake256_prf)
-void kyber_shake256_prf(uint8_t *out, size_t outlen, const uint8_t key[KYBER_SYMBYTES], uint8_t nonce);
 
 #define XOF_BLOCKBYTES SHAKE128_RATE
 
@@ -69,7 +62,7 @@ typedef struct{
 
 //__KYBER_FUSE__: extracted from symmetric-aes.c
 #ifdef KYBER_90S
-void kyber_aes256xof_absorb(aes256ctr_ctx *state, const uint8_t seed[32], uint8_t x, uint8_t y)
+KYBERFUSE_STATIC void kyber_aes256xof_absorb(aes256ctr_ctx *state, const uint8_t seed[32], uint8_t x, uint8_t y)
 {
   uint8_t expnonce[12] = {0};
   expnonce[0] = x;
@@ -77,7 +70,7 @@ void kyber_aes256xof_absorb(aes256ctr_ctx *state, const uint8_t seed[32], uint8_
   aes256ctr_init(state, seed, expnonce);
 }
 
-void kyber_aes256ctr_prf(uint8_t *out, size_t outlen, const uint8_t key[32], uint8_t nonce)
+KYBERFUSE_STATIC void kyber_aes256ctr_prf(uint8_t *out, size_t outlen, const uint8_t key[32], uint8_t nonce)
 {
   uint8_t expnonce[12] = {0};
   expnonce[0] = nonce;
@@ -97,7 +90,7 @@ void kyber_aes256ctr_prf(uint8_t *out, size_t outlen, const uint8_t key[32], uin
 *              - uint8_t i: additional byte of input
 *              - uint8_t j: additional byte of input
 **************************************************/
-void kyber_shake128_absorb(keccak_state *state,
+KYBERFUSE_STATIC void kyber_shake128_absorb(keccak_state *state,
                            const uint8_t seed[KYBER_SYMBYTES],
                            uint8_t x,
                            uint8_t y)
@@ -122,7 +115,7 @@ void kyber_shake128_absorb(keccak_state *state,
 *              - const uint8_t *key: pointer to the key (of length KYBER_SYMBYTES)
 *              - uint8_t nonce: single-byte nonce (public PRF input)
 **************************************************/
-void kyber_shake256_prf(uint8_t *out, size_t outlen, const uint8_t key[KYBER_SYMBYTES], uint8_t nonce)
+KYBERFUSE_STATIC void kyber_shake256_prf(uint8_t *out, size_t outlen, const uint8_t key[KYBER_SYMBYTES], uint8_t nonce)
 {
   uint8_t extkey[KYBER_SYMBYTES+1];
 
