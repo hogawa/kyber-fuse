@@ -62,6 +62,26 @@ def extract_from_poly_h(f_path):
         return content
 
 
+def extract_from_polyvec_h(f_path):
+    """
+    In this file we just have to extract the definition of the 'polyvec' struct
+    :param f_path: path to source polyvec.h file
+    :return: extracted relevant content
+    """
+    content = []
+    with open(f_path, 'r') as in_f:
+        found = False
+        for ln in in_f:
+            if "typedef struct" in ln:
+                found = True
+                content.append(ln)
+            elif found:
+                content.append(ln)
+                if "polyvec;" in ln:
+                    break
+        return content
+
+
 def extract_from_symmetric_aes_c(f_path):
     """
 
@@ -136,6 +156,20 @@ def extract_from_poly_c(f_path):
         return content
 
 
+def extract_from_polyvec_c(f_path):
+    """
+    In this file we can extract everything, except the '#include' statements
+    :param f_path: path to source polyvec.c file
+    :return: extracted relevant content
+    """
+    content = []
+    with open(f_path, 'r') as in_f:
+        for ln in in_f:
+            if "#include" not in ln:
+                content.append(ln)
+        return content
+
+
 if __name__ == '__main__':
     # Create kyber_fused.h header file
     with open('output/kyber_fused.h', 'w') as out_f:
@@ -185,6 +219,11 @@ if __name__ == '__main__':
         out_buf.append('\n//__KYBER_FUSE__: extracted from poly.h\n')
         [out_buf.append(line) for line in extract_from_poly_h('kyber/ref/poly.h')]
         out_buf.append('// end of poly.h\n')
+
+        # ===================================== Load contents from polyvec.h ===========================================
+        out_buf.append('\n//__KYBER_FUSE__: extracted from polyvec.h\n')
+        [out_buf.append(line) for line in extract_from_polyvec_h('kyber/ref/polyvec.h')]
+        out_buf.append('// end of polyvec.h\n')
 
         # Function implementations
         # ===================================== Load contents from symmetric-aes.c =====================================
@@ -309,6 +348,39 @@ if __name__ == '__main__':
         out_buf.insert(ins_idx, 'KYBERFUSE_STATIC ')
 
         ins_idx = out_buf.index('void poly_sub(poly *r, const poly *a, const poly *b)\n')
+        out_buf.insert(ins_idx, 'KYBERFUSE_STATIC ')
+
+        # ======================================= Load contents from polyvec.c =========================================
+        out_buf.append('\n//__KYBER_FUSE__: extracted from polyvec.c')
+        [out_buf.append(line) for line in extract_from_polyvec_c('kyber/ref/polyvec.c')]
+        out_buf.append('// end of polyvec.c\n')
+
+        # Append static to kyber_fused.c functions
+        ins_idx = out_buf.index('void polyvec_compress(uint8_t r[KYBER_POLYVECCOMPRESSEDBYTES], const polyvec *a)\n')
+        out_buf.insert(ins_idx, 'KYBERFUSE_STATIC ')
+
+        ins_idx = out_buf.index('void polyvec_decompress(polyvec *r, const uint8_t a[KYBER_POLYVECCOMPRESSEDBYTES])\n')
+        out_buf.insert(ins_idx, 'KYBERFUSE_STATIC ')
+
+        ins_idx = out_buf.index('void polyvec_tobytes(uint8_t r[KYBER_POLYVECBYTES], const polyvec *a)\n')
+        out_buf.insert(ins_idx, 'KYBERFUSE_STATIC ')
+
+        ins_idx = out_buf.index('void polyvec_frombytes(polyvec *r, const uint8_t a[KYBER_POLYVECBYTES])\n')
+        out_buf.insert(ins_idx, 'KYBERFUSE_STATIC ')
+
+        ins_idx = out_buf.index('void polyvec_ntt(polyvec *r)\n')
+        out_buf.insert(ins_idx, 'KYBERFUSE_STATIC ')
+
+        ins_idx = out_buf.index('void polyvec_invntt_tomont(polyvec *r)\n')
+        out_buf.insert(ins_idx, 'KYBERFUSE_STATIC ')
+
+        ins_idx = out_buf.index('void polyvec_basemul_acc_montgomery(poly *r, const polyvec *a, const polyvec *b)\n')
+        out_buf.insert(ins_idx, 'KYBERFUSE_STATIC ')
+
+        ins_idx = out_buf.index('void polyvec_reduce(polyvec *r)\n')
+        out_buf.insert(ins_idx, 'KYBERFUSE_STATIC ')
+
+        ins_idx = out_buf.index('void polyvec_add(polyvec *r, const polyvec *a, const polyvec *b)\n')
         out_buf.insert(ins_idx, 'KYBERFUSE_STATIC ')
 
         # ========================================== (FINAL) Write to file =============================================
