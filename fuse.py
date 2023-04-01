@@ -170,6 +170,20 @@ def extract_from_polyvec_c(f_path):
         return content
 
 
+def extract_from_indcpa_c(f_path):
+    """
+    In this file we can extract everything, except the '#include' statements
+    :param f_path: path to source indcpa.c file
+    :return: extracted relevant content
+    """
+    content = []
+    with open(f_path, 'r') as in_f:
+        for ln in in_f:
+            if "#include" not in ln:
+                content.append(ln)
+        return content
+
+
 if __name__ == '__main__':
     # Create kyber_fused.h header file
     with open('output/kyber_fused.h', 'w') as out_f:
@@ -197,6 +211,7 @@ if __name__ == '__main__':
         # Include statements
         includes = (
             '#include "kyber_fused.h"\n'
+            '#include "randombytes.h"\n'
         )
         out_buf.append(includes)
 
@@ -381,6 +396,24 @@ if __name__ == '__main__':
         out_buf.insert(ins_idx, 'KYBERFUSE_STATIC ')
 
         ins_idx = out_buf.index('void polyvec_add(polyvec *r, const polyvec *a, const polyvec *b)\n')
+        out_buf.insert(ins_idx, 'KYBERFUSE_STATIC ')
+
+        # ======================================= Load contents from indcpa.c ==========================================
+        out_buf.append('\n//__KYBER_FUSE__: extracted from indcpa.c')
+        [out_buf.append(line) for line in extract_from_indcpa_c('kyber/ref/indcpa.c')]
+        out_buf.append('// end of indcpa.c\n')
+
+        # Append static to indcpa.c functions
+        ins_idx = out_buf.index('void gen_matrix(polyvec *a, const uint8_t seed[KYBER_SYMBYTES], int transposed)\n')
+        out_buf.insert(ins_idx, 'KYBERFUSE_STATIC ')
+
+        ins_idx = out_buf.index('void indcpa_keypair(uint8_t pk[KYBER_INDCPA_PUBLICKEYBYTES],\n')
+        out_buf.insert(ins_idx, 'KYBERFUSE_STATIC ')
+
+        ins_idx = out_buf.index('void indcpa_enc(uint8_t c[KYBER_INDCPA_BYTES],\n')
+        out_buf.insert(ins_idx, 'KYBERFUSE_STATIC ')
+
+        ins_idx = out_buf.index('void indcpa_dec(uint8_t m[KYBER_INDCPA_MSGBYTES],\n')
         out_buf.insert(ins_idx, 'KYBERFUSE_STATIC ')
 
         # ========================================== (FINAL) Write to file =============================================
