@@ -4,6 +4,7 @@
 //__KYBER_FUSE__: common includes
 #include <stdint.h>
 #include <stddef.h>
+#include <string.h>
 
 #ifndef KYBER_K
 #define KYBER_K 3	/* Change this for different security strengths */

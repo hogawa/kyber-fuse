@@ -58,6 +58,34 @@ def extract_from_poly_h(f_path):
         return content
 
 
+def extract_from_symmetric_aes_c(f_path):
+    """
+
+    :param f_path:
+    :return:
+    """
+    content = []
+    with open(f_path, 'r') as in_f:
+        for ln in in_f:
+            if "#include" not in ln:
+                content.append(ln)
+        return content
+
+
+def extract_from_symmetric_shake_c(f_path):
+    """
+
+    :param f_path:
+    :return:
+    """
+    content = []
+    with open(f_path, 'r') as in_f:
+        for ln in in_f:
+            if "#include" not in ln:
+                content.append(ln)
+        return content
+
+
 def extract_from_reduce_c(f_path):
     content = []
     with open(f_path, 'r') as in_f:
@@ -116,6 +144,7 @@ if __name__ == '__main__':
             '//__KYBER_FUSE__: common includes\n'
             '#include <stdint.h>\n'
             '#include <stddef.h>\n'
+            '#include <string.h>\n'
         )
         ins_idx = out_buf.index('#define PARAMS_H\n') + 1
         out_buf.insert(ins_idx, includes)
@@ -154,6 +183,35 @@ if __name__ == '__main__':
         out_buf.append('// end of poly.h\n')
 
         # Function implementations
+        # ===================================== Load contents from symmetric-aes.c =====================================
+        out_buf.append('\n//__KYBER_FUSE__: extracted from symmetric-aes.c\n')
+        out_buf.append('#ifdef KYBER_90S')
+        [out_buf.append(line) for line in extract_from_symmetric_aes_c('kyber/ref/symmetric-aes.c')]
+        out_buf.append('#endif  /* KYBER_90S */\n')
+        out_buf.append('// end of symmetric-aes.c\n')
+
+        # Append 'static' to the functions from symmetric-aes.c
+        # ins_idx = out_buf.index('void kyber_aes256xof_absorb(aes256ctr_ctx *state, const uint8_t seed[32], '
+        #                         'uint8_t x, uint8_t y)\n')
+        # out_buf.insert(ins_idx, 'KYBERFUSE_STATIC ')
+        #
+        # ins_idx = out_buf.index('void kyber_aes256ctr_prf(uint8_t *out, size_t outlen, const uint8_t key[32], '
+        #                         'uint8_t nonce)\n')
+        # out_buf.insert(ins_idx, 'KYBERFUSE_STATIC ')
+
+        # ==================================== Load contents from symmetric-shake.c ====================================
+        out_buf.append('\n//__KYBER_FUSE__: extracted from symmetric-shake.c')
+        [out_buf.append(line) for line in extract_from_symmetric_shake_c('kyber/ref/symmetric-shake.c')]
+        out_buf.append('// end of symmetric-shake.c\n')
+
+        # Append 'static' to the functions from symmetric-shake.c
+        # ins_idx = out_buf.index('void kyber_shake128_absorb(keccak_state *state,\n')
+        # out_buf.insert(ins_idx, 'KYBERFUSE_STATIC ')
+        #
+        # ins_idx = out_buf.index('void kyber_shake256_prf(uint8_t *out, size_t outlen, const uint8_t key['
+        #                         'KYBER_SYMBYTES], uint8_t nonce)\n')
+        # out_buf.insert(ins_idx, 'KYBERFUSE_STATIC ')
+
         # ======================================== Load contents from reduce.c =========================================
         out_buf.append('\n//__KYBER_FUSE__: extracted from reduce.c')
         [out_buf.append(line) for line in extract_from_reduce_c('kyber/ref/reduce.c')]
@@ -197,9 +255,57 @@ if __name__ == '__main__':
         out_buf.insert(ins_idx, 'KYBERFUSE_STATIC ')
 
         # ========================================= Load contents from poly.c ==========================================
-        # out_buf.append('\n//__KYBER_FUSE__: extracted from poly.c')
-        # [out_buf.append(line) for line in extract_from_poly_c('kyber/ref/poly.c')]
-        # out_buf.append('// end of poly.c\n')
+        out_buf.append('\n//__KYBER_FUSE__: extracted from poly.c\n')
+        out_buf.append('KYBERFUSE_STATIC void poly_reduce(poly *r);  // HSO: workaround since this is called before '
+                       'the implementation\n')
+        [out_buf.append(line) for line in extract_from_poly_c('kyber/ref/poly.c')]
+        out_buf.append('// end of poly.c\n')
+
+        # Append static to poly.c functions
+        ins_idx = out_buf.index('void poly_compress(uint8_t r[KYBER_POLYCOMPRESSEDBYTES], const poly *a)\n')
+        out_buf.insert(ins_idx, 'KYBERFUSE_STATIC ')
+
+        ins_idx = out_buf.index('void poly_decompress(poly *r, const uint8_t a[KYBER_POLYCOMPRESSEDBYTES])\n')
+        out_buf.insert(ins_idx, 'KYBERFUSE_STATIC ')
+
+        ins_idx = out_buf.index('void poly_tobytes(uint8_t r[KYBER_POLYBYTES], const poly *a)\n')
+        out_buf.insert(ins_idx, 'KYBERFUSE_STATIC ')
+
+        ins_idx = out_buf.index('void poly_frombytes(poly *r, const uint8_t a[KYBER_POLYBYTES])\n')
+        out_buf.insert(ins_idx, 'KYBERFUSE_STATIC ')
+
+        ins_idx = out_buf.index('void poly_frommsg(poly *r, const uint8_t msg[KYBER_INDCPA_MSGBYTES])\n')
+        out_buf.insert(ins_idx, 'KYBERFUSE_STATIC ')
+
+        ins_idx = out_buf.index('void poly_tomsg(uint8_t msg[KYBER_INDCPA_MSGBYTES], const poly *a)\n')
+        out_buf.insert(ins_idx, 'KYBERFUSE_STATIC ')
+
+        ins_idx = out_buf.index('void poly_getnoise_eta1(poly *r, const uint8_t seed[KYBER_SYMBYTES], uint8_t nonce)\n')
+        out_buf.insert(ins_idx, 'KYBERFUSE_STATIC ')
+
+        ins_idx = out_buf.index('void poly_getnoise_eta2(poly *r, const uint8_t seed[KYBER_SYMBYTES], uint8_t nonce)\n')
+        out_buf.insert(ins_idx, 'KYBERFUSE_STATIC ')
+
+        ins_idx = out_buf.index('void poly_ntt(poly *r)\n')
+        out_buf.insert(ins_idx, 'KYBERFUSE_STATIC ')
+
+        ins_idx = out_buf.index('void poly_invntt_tomont(poly *r)\n')
+        out_buf.insert(ins_idx, 'KYBERFUSE_STATIC ')
+
+        ins_idx = out_buf.index('void poly_basemul_montgomery(poly *r, const poly *a, const poly *b)\n')
+        out_buf.insert(ins_idx, 'KYBERFUSE_STATIC ')
+
+        ins_idx = out_buf.index('void poly_tomont(poly *r)\n')
+        out_buf.insert(ins_idx, 'KYBERFUSE_STATIC ')
+
+        ins_idx = out_buf.index('void poly_reduce(poly *r)\n')
+        out_buf.insert(ins_idx, 'KYBERFUSE_STATIC ')
+
+        ins_idx = out_buf.index('void poly_add(poly *r, const poly *a, const poly *b)\n')
+        out_buf.insert(ins_idx, 'KYBERFUSE_STATIC ')
+
+        ins_idx = out_buf.index('void poly_sub(poly *r, const poly *a, const poly *b)\n')
+        out_buf.insert(ins_idx, 'KYBERFUSE_STATIC ')
 
         # ========================================== (FINAL) Write to file =============================================
         for line in out_buf:

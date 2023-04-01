@@ -9,4 +9,6 @@ Glue code for combining CRYSTALS-Kyber implementation files
 - [x] `poly.h`
 - [x] `cbd.c`
 - [x] `symmetric.h`
-- [ ] `poly.c`
+- [x] `symmetric-aes.c`
+- [x] `symmetric-shake.c`
+- [x] `poly.c`
