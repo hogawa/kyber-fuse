@@ -15,6 +15,29 @@ def extract_from_reduce_h(f_path):
         return content
 
 
+def extract_from_symmetric_h(f_path):
+    """
+    In this file we have to extract everything except the includes and the header defines
+    :param f_path: path to symmetric.h file
+    :return: extracted relevant content
+    """
+    content = []
+    with open(f_path, 'r') as in_f:
+        go = False  # This is to remove the initial empty lines
+        for ln in in_f:
+            if 'KYBER_90S' in ln:
+                go = True  # From here on, we can start extracting lines
+            if go:
+                if 'SYMMETRIC_H' not in ln and \
+                        '#include <stddef.h>' not in ln and \
+                        '#include <stdint.h>' not in ln and \
+                        '#include "params.h"' not in ln:
+                    content.append(ln)
+            if '#endif /* KYBER_90S */' in ln:
+                go = False  # Stop extraction here to avoid blank line
+        return content
+
+
 def extract_from_poly_h(f_path):
     """
     In this file we just have to extract the definition of the 'poly' struct
@@ -118,6 +141,11 @@ if __name__ == '__main__':
         out_buf.append('\n//__KYBER_FUSE__: extracted from reduce.h\n')
         [out_buf.append(line) for line in extract_from_reduce_h('kyber/ref/reduce.h')]
         out_buf.append('// end of reduce.h\n')
+
+        # ===================================== Load contents from symmetric.h =========================================
+        out_buf.append('\n//__KYBER_FUSE__: extracted from symmetric.h\n')
+        [out_buf.append(line) for line in extract_from_symmetric_h('kyber/ref/symmetric.h')]
+        out_buf.append('// end of symmetric.h\n')
 
         # Structs and common variables
         # ======================================= Load contents from poly.h ============================================

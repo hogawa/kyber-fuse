@@ -7,6 +7,6 @@ Glue code for combining CRYSTALS-Kyber implementation files
 - [x] `reduce.h` / `reduce.c`
 - [x] `ntt.h` / `ntt.c`
 - [x] `poly.h`
-- [ ] `cbd.c`
-- [ ] `symmetric.h`
+- [x] `cbd.c`
+- [x] `symmetric.h`
 - [ ] `poly.c`
