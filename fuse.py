@@ -189,6 +189,7 @@ if __name__ == '__main__':
     with open('output/kyber_fused.h', 'w') as out_f:
         # ======================================== Load contents from params.h =========================================
         out_buf = extract_from_params_h('kyber/ref/params.h')
+        out_buf = [s.replace('PARAMS_H', 'KYBER_FUSED_H') for s in out_buf]
 
         # Insert include statements right after header define
         includes = (
@@ -198,7 +199,7 @@ if __name__ == '__main__':
             '#include <stddef.h>\n'
             '#include <string.h>\n'
         )
-        ins_idx = out_buf.index('#define PARAMS_H\n') + 1
+        ins_idx = out_buf.index('#define KYBER_FUSED_H\n') + 1
         out_buf.insert(ins_idx, includes)
 
         # =========================================== (FINAL) Write to file ============================================

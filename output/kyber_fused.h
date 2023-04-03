@@ -1,5 +1,5 @@
-#ifndef PARAMS_H
-#define PARAMS_H
+#ifndef KYBER_FUSED_H
+#define KYBER_FUSED_H
 
 //__KYBER_FUSE__: common includes
 #include <stdint.h>
