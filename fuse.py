@@ -203,6 +203,34 @@ def extract_from_indcpa_c(f_path):
         return content
 
 
+def extract_from_verify_c(f_path):
+    """
+    In this file we can extract everything, except the '#include' statements
+    :param f_path: path to source verify.c file
+    :return: extracted relevant content
+    """
+    content = []
+    with open(f_path, 'r') as in_f:
+        for ln in in_f:
+            if "#include" not in ln:
+                content.append(ln)
+        return content
+
+
+def extract_from_kem_c(f_path):
+    """
+    In this file we can extract everything, except the '#include' statements
+    :param f_path: path to source kem.c file
+    :return: extracted relevant content
+    """
+    content = []
+    with open(f_path, 'r') as in_f:
+        for ln in in_f:
+            if "#include" not in ln:
+                content.append(ln)
+        return content
+
+
 if __name__ == '__main__':
     # Create kyber_fused.h header file
     with open('output/kyber_fused.h', 'w') as out_f:
@@ -443,6 +471,22 @@ if __name__ == '__main__':
 
         ins_idx = out_buf.index('void indcpa_dec(uint8_t m[KYBER_INDCPA_MSGBYTES],\n')
         out_buf.insert(ins_idx, 'KYBERFUSE_STATIC ')
+
+        # ======================================= Load contents from verify.c ==========================================
+        out_buf.append('\n//__KYBER_FUSE__: extracted from verify.c')
+        [out_buf.append(line) for line in extract_from_verify_c('kyber/ref/verify.c')]
+        out_buf.append('// end of verify.c\n')
+
+        ins_idx = out_buf.index('int verify(const uint8_t *a, const uint8_t *b, size_t len)\n')
+        out_buf.insert(ins_idx, 'KYBERFUSE_STATIC ')
+
+        ins_idx = out_buf.index('void cmov(uint8_t *r, const uint8_t *x, size_t len, uint8_t b)\n')
+        out_buf.insert(ins_idx, 'KYBERFUSE_STATIC ')
+
+        # ========================================= Load contents from kem.c ===========================================
+        out_buf.append('\n//__KYBER_FUSE__: extracted from kem.c')
+        [out_buf.append(line) for line in extract_from_kem_c('kyber/ref/kem.c')]
+        out_buf.append('// end of kem.c\n')
 
         # ========================================== (FINAL) Write to file =============================================
         for line in out_buf:

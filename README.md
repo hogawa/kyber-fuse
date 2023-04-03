@@ -14,4 +14,4 @@ Glue code for combining CRYSTALS-Kyber implementation files
 - [x] `poly.c`
 - [x] `polyvec.c`
 - [x] `indcpa.c`
-- [ ] `kem.c`
+- [x] `kem.c`
