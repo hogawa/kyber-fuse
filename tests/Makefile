@@ -1,8 +1,8 @@
 CC       = gcc
 CFLAGS   = -Wall -g -O2
-INCLUDES = -I ../output/
-VPATH    = ../output/
-OBJS     = kyber_fused.o
+INCLUDES = -I ../output/ -I ../kyber/ref/
+VPATH    = ../output/ ../kyber/ref/
+OBJS     = aes256ctr.o fips202.o sha256.o sha512.o randombytes.o kyber_fused.o
 
 %.o: %.c
 	$(CC) $(CFLAGS) $(INCLUDES) -c $^ -o $(@F)

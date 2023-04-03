@@ -1,9 +1,10 @@
-#ifndef PARAMS_H
-#define PARAMS_H
+#ifndef KYBER_FUSED_H
+#define KYBER_FUSED_H
 
 //__KYBER_FUSE__: common includes
 #include <stdint.h>
 #include <stddef.h>
+#include <string.h>
 
 #ifndef KYBER_K
 #define KYBER_K 3	/* Change this for different security strengths */
@@ -69,4 +70,35 @@
 #define KYBER_SECRETKEYBYTES  (KYBER_INDCPA_SECRETKEYBYTES + KYBER_INDCPA_PUBLICKEYBYTES + 2*KYBER_SYMBYTES)
 #define KYBER_CIPHERTEXTBYTES (KYBER_INDCPA_BYTES)
 
+//__KYBER_FUSE__: extracted from kem.h
+#if   (KYBER_K == 2)
+#ifdef KYBER_90S
+#define CRYPTO_ALGNAME "Kyber512-90s"
+#else
+#define CRYPTO_ALGNAME "Kyber512"
 #endif
+#elif (KYBER_K == 3)
+#ifdef KYBER_90S
+#define CRYPTO_ALGNAME "Kyber768-90s"
+#else
+#define CRYPTO_ALGNAME "Kyber768"
+#endif
+#elif (KYBER_K == 4)
+#ifdef KYBER_90S
+#define CRYPTO_ALGNAME "Kyber1024-90s"
+#else
+#define CRYPTO_ALGNAME "Kyber1024"
+#endif
+#endif
+
+#define crypto_kem_keypair KYBER_NAMESPACE(keypair)
+int crypto_kem_keypair(uint8_t *pk, uint8_t *sk);
+
+#define crypto_kem_enc KYBER_NAMESPACE(enc)
+int crypto_kem_enc(uint8_t *ct, uint8_t *ss, const uint8_t *pk);
+
+#define crypto_kem_dec KYBER_NAMESPACE(dec)
+int crypto_kem_dec(uint8_t *ss, const uint8_t *ct, const uint8_t *sk);
+// end of kem.h
+
+#endif  /* KYBER_FUSED_H */
