@@ -35,3 +35,18 @@ def extract_lines_excluding(f_path, str_undesired):
             else:
                 content.append(ln)
         return content
+
+
+def extract_lines_occurrences(f_path, str_desired):
+    """
+    This extracts all the lines of the file where the occurrences specified in str_undesired appear
+    :param f_path: path to source file
+    :param str_desired: list of desired string occurrences marking lines to be included
+    :return: extracted relevant content
+    """
+    content = []
+    with open(f_path, 'r') as in_f:
+        for ln in in_f:
+            if any(undesired in ln for undesired in str_desired):
+                content.append(ln)
+        return content

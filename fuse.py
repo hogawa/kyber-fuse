@@ -1,5 +1,6 @@
 from extractors.extractors import extract_lines_between
 from extractors.extractors import extract_lines_excluding
+from extractors.extractors import extract_lines_occurrences
 
 
 def extract_from_params_h(f_path):
@@ -29,14 +30,15 @@ def extract_from_kem_h(f_path):
 
 
 def extract_from_reduce_h(f_path):
-    content = []
-    with open(f_path, 'r') as in_f:
-        for ln in in_f:
-            if 'MONT' in ln:
-                content.append(ln)
-            if 'QINV' in ln:
-                content.append(ln)
-        return content
+    """
+    In this file we just have to extract the definitions of the 'MONT' and 'QINV' parameters
+    :param f_path: path to reduce.h source file
+    :return: extracted relevant content
+    """
+    return extract_lines_occurrences(
+        f_path,
+        ['MONT', 'QINV']
+    )
 
 
 def extract_from_symmetric_h(f_path):
