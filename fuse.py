@@ -1,4 +1,5 @@
 from extractors.extractors import extract_lines_between
+from extractors.extractors import extract_lines_excluding
 
 
 def extract_from_params_h(f_path):
@@ -93,48 +94,50 @@ def extract_from_polyvec_h(f_path):
 
 def extract_from_symmetric_aes_c(f_path):
     """
-
-    :param f_path:
-    :return:
+    In this file we extract all except the 'include' statements
+    :param f_path: path to symmetric-aes.c source file
+    :return: extracted relevant content
     """
-    content = []
-    with open(f_path, 'r') as in_f:
-        for ln in in_f:
-            if "#include" not in ln:
-                content.append(ln)
-        return content
+    return extract_lines_excluding(
+        f_path,
+        ['#include']
+    )
 
 
 def extract_from_symmetric_shake_c(f_path):
     """
-
-    :param f_path:
-    :return:
+    In this file we extract all except the 'include' statements
+    :param f_path: path to symmetric-shake.c source file
+    :return: extracted relevant content
     """
-    content = []
-    with open(f_path, 'r') as in_f:
-        for ln in in_f:
-            if "#include" not in ln:
-                content.append(ln)
-        return content
+    return extract_lines_excluding(
+        f_path,
+        ['#include']
+    )
 
 
 def extract_from_reduce_c(f_path):
-    content = []
-    with open(f_path, 'r') as in_f:
-        for ln in in_f:
-            if "#include" not in ln:
-                content.append(ln)
-        return content
+    """
+    In this file we extract all except the 'include' statements
+    :param f_path: path to reduce.c source file
+    :return: extracted relevant content
+    """
+    return extract_lines_excluding(
+        f_path,
+        ['#include']
+    )
 
 
 def extract_from_ntt_c(f_path):
-    content = []
-    with open(f_path, 'r') as in_f:
-        for ln in in_f:
-            if "#include" not in ln:
-                content.append(ln)
-        return content
+    """
+    In this file we extract all except the 'include' statements
+    :param f_path: path to ntt.c source file
+    :return: extracted relevant content
+    """
+    return extract_lines_excluding(
+        f_path,
+        ['#include']
+    )
 
 
 def extract_from_cbd_c(f_path):
@@ -143,12 +146,10 @@ def extract_from_cbd_c(f_path):
     :param f_path: path to source cbd.c file
     :return: extracted relevant content
     """
-    content = []
-    with open(f_path, 'r') as in_f:
-        for ln in in_f:
-            if "#include" not in ln:
-                content.append(ln)
-        return content
+    return extract_lines_excluding(
+        f_path,
+        ['#include']
+    )
 
 
 def extract_from_poly_c(f_path):
@@ -157,12 +158,10 @@ def extract_from_poly_c(f_path):
     :param f_path: path to source poly.c file
     :return: extracted relevant content
     """
-    content = []
-    with open(f_path, 'r') as in_f:
-        for ln in in_f:
-            if "#include" not in ln:
-                content.append(ln)
-        return content
+    return extract_lines_excluding(
+        f_path,
+        ['#include']
+    )
 
 
 def extract_from_polyvec_c(f_path):
@@ -171,12 +170,10 @@ def extract_from_polyvec_c(f_path):
     :param f_path: path to source polyvec.c file
     :return: extracted relevant content
     """
-    content = []
-    with open(f_path, 'r') as in_f:
-        for ln in in_f:
-            if "#include" not in ln:
-                content.append(ln)
-        return content
+    return extract_lines_excluding(
+        f_path,
+        ['#include']
+    )
 
 
 def extract_from_indcpa_c(f_path):
@@ -185,12 +182,10 @@ def extract_from_indcpa_c(f_path):
     :param f_path: path to source indcpa.c file
     :return: extracted relevant content
     """
-    content = []
-    with open(f_path, 'r') as in_f:
-        for ln in in_f:
-            if "#include" not in ln:
-                content.append(ln)
-        return content
+    return extract_lines_excluding(
+        f_path,
+        ['#include']
+    )
 
 
 def extract_from_verify_c(f_path):
@@ -199,12 +194,10 @@ def extract_from_verify_c(f_path):
     :param f_path: path to source verify.c file
     :return: extracted relevant content
     """
-    content = []
-    with open(f_path, 'r') as in_f:
-        for ln in in_f:
-            if "#include" not in ln:
-                content.append(ln)
-        return content
+    return extract_lines_excluding(
+        f_path,
+        ['#include']
+    )
 
 
 def extract_from_kem_c(f_path):
@@ -213,12 +206,10 @@ def extract_from_kem_c(f_path):
     :param f_path: path to source kem.c file
     :return: extracted relevant content
     """
-    content = []
-    with open(f_path, 'r') as in_f:
-        for ln in in_f:
-            if "#include" not in ln:
-                content.append(ln)
-        return content
+    return extract_lines_excluding(
+        f_path,
+        ['#include']
+    )
 
 
 if __name__ == '__main__':
