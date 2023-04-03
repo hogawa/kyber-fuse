@@ -1,6 +1,25 @@
 def extract_from_params_h(f_path):
+    content = []
+    go = True
     with open(f_path, 'r') as in_f:
-        content = [ln for ln in in_f]
+        for ln in in_f:
+            content.append(ln)
+            if '#define KYBER_CIPHERTEXTBYTES (KYBER_INDCPA_BYTES)' in ln:
+                break
+        return content
+
+
+def extract_from_kem_h(f_path):
+    content = []
+    go = False
+    with open(f_path, 'r') as in_f:
+        for ln in in_f:
+            if 'KYBER_K == 2' in ln:
+                go = True
+            if go:
+                content.append(ln)
+            if 'crypto_kem_dec(uint8_t *ss, const uint8_t *ct, const uint8_t *sk);' in ln:
+                break
         return content
 
 
@@ -189,6 +208,8 @@ if __name__ == '__main__':
     with open('output/kyber_fused.h', 'w') as out_f:
         # ======================================== Load contents from params.h =========================================
         out_buf = extract_from_params_h('kyber/ref/params.h')
+
+        # Replace header define according to filename
         out_buf = [s.replace('PARAMS_H', 'KYBER_FUSED_H') for s in out_buf]
 
         # Insert include statements right after header define
@@ -201,6 +222,12 @@ if __name__ == '__main__':
         )
         ins_idx = out_buf.index('#define KYBER_FUSED_H\n') + 1
         out_buf.insert(ins_idx, includes)
+
+        # ======================================== Load contents from kem.h ============================================
+        out_buf.append('\n//__KYBER_FUSE__: extracted from kem.h\n')
+        [out_buf.append(line) for line in extract_from_kem_h('kyber/ref/kem.h')]
+        out_buf.append('// end of kem.h\n')
+        out_buf.append('\n#endif  /* KYBER_FUSED_H */\n')
 
         # =========================================== (FINAL) Write to file ============================================
         for line in out_buf:
