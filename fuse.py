@@ -1,6 +1,7 @@
 from extractors.extractors import extract_lines_between
 from extractors.extractors import extract_lines_excluding
 from extractors.extractors import extract_lines_occurrences
+from extractors.extractors import extract_lines_between_excluding
 
 
 def extract_from_params_h(f_path):
@@ -47,25 +48,13 @@ def extract_from_symmetric_h(f_path):
     :param f_path: path to symmetric.h file
     :return: extracted relevant content
     """
-    content = []
-    with open(f_path, 'r') as in_f:
-        go = False  # This is to remove the initial empty lines
-        for ln in in_f:
-            if 'KYBER_90S' in ln:
-                go = True  # From here on, we can start extracting lines
-            if go:
-                if 'SYMMETRIC_H' not in ln and \
-                        '#include <stddef.h>' not in ln and \
-                        '#include <stdint.h>' not in ln and \
-                        'void' not in ln and \
-                        'const uint8_t seed[KYBER_SYMBYTES],' not in ln and \
-                        'uint8_t x,' not in ln and \
-                        'uint8_t y);' not in ln and \
-                        '#include "params.h"' not in ln:
-                    content.append(ln)
-            if '#endif /* KYBER_90S */' in ln:
-                go = False  # Stop extraction here to avoid blank line
-        return content
+    return extract_lines_between_excluding(
+        f_path,
+        '#ifdef KYBER_90S',
+        '#endif /* KYBER_90S */',
+        ['SYMMETRIC_H', '#include <stddef.h>', '#include <stdint.h>', 'void',
+         'const uint8_t seed[KYBER_SYMBYTES],', 'uint8_t x,', 'uint8_t y);', '#include "params.h"']
+    )
 
 
 def extract_from_poly_h(f_path):
