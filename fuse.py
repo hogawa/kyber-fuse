@@ -1,26 +1,30 @@
+from extractors.extractors import extract_lines_between
+
+
 def extract_from_params_h(f_path):
-    content = []
-    go = True
-    with open(f_path, 'r') as in_f:
-        for ln in in_f:
-            content.append(ln)
-            if '#define KYBER_CIPHERTEXTBYTES (KYBER_INDCPA_BYTES)' in ln:
-                break
-        return content
+    """
+    In this file we extract everything except the last '#endif' statement
+    :param f_path: path to params.h source file
+    :return: extracted relevant content
+    """
+    return extract_lines_between(
+        f_path,
+        '#ifndef PARAMS_H',
+        '#define KYBER_CIPHERTEXTBYTES (KYBER_INDCPA_BYTES)'
+    )
 
 
 def extract_from_kem_h(f_path):
-    content = []
-    go = False
-    with open(f_path, 'r') as in_f:
-        for ln in in_f:
-            if 'KYBER_K == 2' in ln:
-                go = True
-            if go:
-                content.append(ln)
-            if 'crypto_kem_dec(uint8_t *ss, const uint8_t *ct, const uint8_t *sk);' in ln:
-                break
-        return content
+    """
+    In this file, we disconsider the (1) header define, (2) includes, and (3) CRYPTO_* definitions
+    :param f_path: path to kem.h source file
+    :return: extracted relevant content
+    """
+    return extract_lines_between(
+        f_path,
+        'KYBER_K == 2',
+        'crypto_kem_dec(uint8_t *ss, const uint8_t *ct, const uint8_t *sk);'
+    )
 
 
 def extract_from_reduce_h(f_path):
@@ -67,18 +71,11 @@ def extract_from_poly_h(f_path):
     :param f_path: path to source poly.h file
     :return: extracted relevant content
     """
-    content = []
-    with open(f_path, 'r') as in_f:
-        found = False
-        for ln in in_f:
-            if "typedef struct" in ln:
-                found = True
-                content.append(ln)
-            elif found:
-                content.append(ln)
-                if "poly;" in ln:
-                    break
-        return content
+    return extract_lines_between(
+        f_path,
+        'typedef struct',
+        'poly;'
+    )
 
 
 def extract_from_polyvec_h(f_path):
@@ -87,18 +84,11 @@ def extract_from_polyvec_h(f_path):
     :param f_path: path to source polyvec.h file
     :return: extracted relevant content
     """
-    content = []
-    with open(f_path, 'r') as in_f:
-        found = False
-        for ln in in_f:
-            if "typedef struct" in ln:
-                found = True
-                content.append(ln)
-            elif found:
-                content.append(ln)
-                if "polyvec;" in ln:
-                    break
-        return content
+    return extract_lines_between(
+        f_path,
+        'typedef struct',
+        'polyvec;'
+    )
 
 
 def extract_from_symmetric_aes_c(f_path):
